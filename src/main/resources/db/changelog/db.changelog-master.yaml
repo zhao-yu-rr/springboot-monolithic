@@ -1,0 +1,14 @@
+databaseChangeLog:
+  # ==========================================
+  # 建表 DDL
+  # ==========================================
+  - include:
+      file: db/changelog/changes/v001-create-tables.yaml
+      relativeToChangelogFile: false
+
+  # ==========================================
+  # 数据初始化 DML
+  # ==========================================
+  - include:
+      file: db/changelog/changes/v002-init-data.yaml
+      relativeToChangelogFile: false

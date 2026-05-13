@@ -1,0 +1,387 @@
+databaseChangeLog:
+  # ============================================================
+  # 建表汇总：包含所有 CREATE TABLE 操作
+  # ============================================================
+
+  # --- 1. 创建角色表 ---
+  - changeSet:
+      id: v001-create-sys-role
+      author: scaffold
+      comment: 创建角色表
+      changes:
+        - createTable:
+            tableName: sys_role
+            remarks: 角色表
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sys_role
+              - column:
+                  name: role_code
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_role_code
+              - column:
+                  name: role_name
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(100)
+              - column:
+                  name: status
+                  type: TINYINT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: create_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+  # --- 2. 创建用户表 ---
+  - changeSet:
+      id: v002-create-sys-user
+      author: scaffold
+      comment: 创建用户表
+      changes:
+        - createTable:
+            tableName: sys_user
+            remarks: 用户表
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sys_user
+              - column:
+                  name: username
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_username
+              - column:
+                  name: password
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nickname
+                  type: VARCHAR(50)
+              - column:
+                  name: email
+                  type: VARCHAR(100)
+              - column:
+                  name: phone
+                  type: VARCHAR(20)
+              - column:
+                  name: avatar
+                  type: VARCHAR(255)
+              - column:
+                  name: status
+                  type: TINYINT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: create_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+  # --- 3. 创建用户-角色关联表 ---
+  - changeSet:
+      id: v003-create-sys-user-role
+      author: scaffold
+      comment: 创建用户-角色关联表
+      changes:
+        - createTable:
+            tableName: sys_user_role
+            remarks: 用户-角色关联表
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sys_user_role
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: sys_user_role
+            indexName: idx_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: sys_user_role
+            indexName: idx_role_id
+            columns:
+              - column:
+                  name: role_id
+        - addUniqueConstraint:
+            tableName: sys_user_role
+            columnNames: user_id, role_id
+            constraintName: uk_user_role
+
+  # --- 4. 创建权限表 ---
+  - changeSet:
+      id: v004-create-sys-permission
+      author: scaffold
+      comment: 创建权限表
+      changes:
+        - createTable:
+            tableName: sys_permission
+            remarks: 权限表
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sys_permission
+              - column:
+                  name: permission_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_permission_code
+              - column:
+                  name: permission_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                  remarks: 权限类型：MENU-菜单，BUTTON-按钮，API-接口
+              - column:
+                  name: parent_id
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  remarks: 父级权限ID，0表示顶级
+              - column:
+                  name: sort_order
+                  type: INT
+                  defaultValueNumeric: 0
+                  remarks: 排序号
+              - column:
+                  name: path
+                  type: VARCHAR(200)
+                  remarks: 菜单路径或接口路径
+              - column:
+                  name: icon
+                  type: VARCHAR(100)
+                  remarks: 菜单图标
+              - column:
+                  name: description
+                  type: VARCHAR(100)
+              - column:
+                  name: status
+                  type: TINYINT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: create_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+  # --- 5. 创建角色-权限关联表 ---
+  - changeSet:
+      id: v005-create-sys-role-permission
+      author: scaffold
+      comment: 创建角色-权限关联表
+      changes:
+        - createTable:
+            tableName: sys_role_permission
+            remarks: 角色-权限关联表
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sys_role_permission
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: sys_role_permission
+            indexName: idx_role_id
+            columns:
+              - column:
+                  name: role_id
+        - createIndex:
+            tableName: sys_role_permission
+            indexName: idx_permission_id
+            columns:
+              - column:
+                  name: permission_id
+        - addUniqueConstraint:
+            tableName: sys_role_permission
+            columnNames: role_id, permission_id
+            constraintName: uk_role_permission
+
+  # --- 6. 创建文件管理表 ---
+  - changeSet:
+      id: v006-create-sys-file
+      author: scaffold
+      comment: 创建文件管理表
+      changes:
+        - createTable:
+            tableName: sys_file
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_sys_file
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  remarks: 原始文件名
+              - column:
+                  name: original
+                  type: VARCHAR(255)
+                  remarks: 原始文件名
+              - column:
+                  name: file_type
+                  type: VARCHAR(100)
+                  remarks: 文件类型（MIME类型）
+              - column:
+                  name: suffix
+                  type: VARCHAR(50)
+                  remarks: 文件后缀
+              - column:
+                  name: size
+                  type: BIGINT
+                  remarks: 文件大小，单位字节
+              - column:
+                  name: storage_type
+                  type: VARCHAR(50)
+                  defaultValue: RUSTFS
+                  remarks: 存储类型
+              - column:
+                  name: storage_url
+                  type: VARCHAR(500)
+                  remarks: 存储地址（对象Key）
+              - column:
+                  name: bucket_name
+                  type: VARCHAR(100)
+                  remarks: 桶名
+              - column:
+                  name: object_name
+                  type: VARCHAR(500)
+                  remarks: 桶内文件名
+              - column:
+                  name: preview_url
+                  type: VARCHAR(500)
+                  remarks: 预览地址
+              - column:
+                  name: visit_count
+                  type: INT
+                  defaultValueNumeric: 0
+                  remarks: 访问次数
+              - column:
+                  name: create_by
+                  type: BIGINT
+                  remarks: 创建人ID
+              - column:
+                  name: create_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: 创建时间
+              - column:
+                  name: update_by
+                  type: BIGINT
+                  remarks: 修改人ID
+              - column:
+                  name: update_time
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: 更新时间
+              - column:
+                  name: deleted
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  remarks: 逻辑删除（0：未删除；1：已删除）

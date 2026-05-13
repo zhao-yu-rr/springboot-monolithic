@@ -1,0 +1,820 @@
+databaseChangeLog:
+  # ============================================================
+  # 数据初始化汇总：包含所有 INSERT 操作
+  # ============================================================
+
+  # ============================================================
+  # 一、初始化角色与超级管理员用户
+  # ============================================================
+
+  # --- 1.1 初始化默认角色 ---
+  - changeSet:
+      id: v007-insert-default-roles
+      author: scaffold
+      comment: 初始化默认角色数据（ADMIN、USER）
+      changes:
+        - insert:
+            tableName: sys_role
+            columns:
+              - column:
+                  name: role_code
+                  value: ADMIN
+              - column:
+                  name: role_name
+                  value: 管理员
+              - column:
+                  name: description
+                  value: 系统管理员，拥有所有权限
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_role
+            columns:
+              - column:
+                  name: role_code
+                  value: USER
+              - column:
+                  name: role_name
+                  value: 普通用户
+              - column:
+                  name: description
+                  value: 系统普通用户，拥有基本权限
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+
+  # --- 1.2 初始化超级管理员用户 ---
+  - changeSet:
+      id: v007-insert-admin-user
+      author: scaffold
+      comment: 初始化超级管理员用户（admin / admin123）
+      changes:
+        - insert:
+            tableName: sys_user
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2a$10$bnp0pJJ8TdUNyKm9B226PO6iemLjIv33UwnUs0qvj61Tx76a1DVIW
+              - column:
+                  name: nickname
+                  value: 超级管理员
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+
+  # --- 1.3 为超级管理员分配 ADMIN 角色 ---
+  - changeSet:
+      id: v007-assign-admin-role
+      author: scaffold
+      comment: 为超级管理员分配ADMIN角色
+      changes:
+        - insert:
+            tableName: sys_user_role
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: role_id
+                  valueNumeric: 1
+
+  # ============================================================
+  # 二、初始化权限数据（菜单 + 按钮/API）
+  # ============================================================
+
+  # --- 2.1 菜单权限 ---
+  - changeSet:
+      id: v007-insert-menu-permissions
+      author: scaffold
+      comment: 初始化菜单权限数据
+      changes:
+        # 系统管理（顶级菜单）
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM
+              - column:
+                  name: permission_name
+                  value: 系统管理
+              - column:
+                  name: permission_type
+                  value: MENU
+              - column:
+                  name: parent_id
+                  valueNumeric: 0
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: path
+                  value: /system
+              - column:
+                  name: icon
+                  value: setting
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # 用户管理
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_USER
+              - column:
+                  name: permission_name
+                  value: 用户管理
+              - column:
+                  name: permission_type
+                  value: MENU
+              - column:
+                  name: parent_id
+                  valueNumeric: 1
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: path
+                  value: /system/user
+              - column:
+                  name: icon
+                  value: user
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # 角色管理
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE
+              - column:
+                  name: permission_name
+                  value: 角色管理
+              - column:
+                  name: permission_type
+                  value: MENU
+              - column:
+                  name: parent_id
+                  valueNumeric: 1
+              - column:
+                  name: sort_order
+                  valueNumeric: 2
+              - column:
+                  name: path
+                  value: /system/role
+              - column:
+                  name: icon
+                  value: team
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # 权限管理
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION
+              - column:
+                  name: permission_name
+                  value: 权限管理
+              - column:
+                  name: permission_type
+                  value: MENU
+              - column:
+                  name: parent_id
+                  valueNumeric: 1
+              - column:
+                  name: sort_order
+                  valueNumeric: 3
+              - column:
+                  name: path
+                  value: /system/permission
+              - column:
+                  name: icon
+                  value: lock
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # 文件管理
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_FILE
+              - column:
+                  name: permission_name
+                  value: 文件管理
+              - column:
+                  name: permission_type
+                  value: MENU
+              - column:
+                  name: parent_id
+                  valueNumeric: 1
+              - column:
+                  name: sort_order
+                  valueNumeric: 4
+              - column:
+                  name: path
+                  value: /system/file
+              - column:
+                  name: icon
+                  value: file
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+
+  # --- 2.2 按钮/API 权限 ---
+  - changeSet:
+      id: v007-insert-button-permissions
+      author: scaffold
+      comment: 初始化按钮和接口权限数据
+      changes:
+        # ------ 用户管理按钮权限 ------
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_USER_CREATE
+              - column:
+                  name: permission_name
+                  value: 创建用户
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 2
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_USER_DELETE
+              - column:
+                  name: permission_name
+                  value: 删除用户
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 2
+              - column:
+                  name: sort_order
+                  valueNumeric: 2
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_USER_UPDATE
+              - column:
+                  name: permission_name
+                  value: 编辑用户
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 2
+              - column:
+                  name: sort_order
+                  valueNumeric: 3
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_USER_QUERY
+              - column:
+                  name: permission_name
+                  value: 查询用户
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 2
+              - column:
+                  name: sort_order
+                  valueNumeric: 4
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # ------ 角色管理按钮权限 ------
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE_CREATE
+              - column:
+                  name: permission_name
+                  value: 创建角色
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 3
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE_DELETE
+              - column:
+                  name: permission_name
+                  value: 删除角色
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 3
+              - column:
+                  name: sort_order
+                  valueNumeric: 2
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE_UPDATE
+              - column:
+                  name: permission_name
+                  value: 编辑角色
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 3
+              - column:
+                  name: sort_order
+                  valueNumeric: 3
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE_QUERY
+              - column:
+                  name: permission_name
+                  value: 查询角色
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 3
+              - column:
+                  name: sort_order
+                  valueNumeric: 4
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_ROLE_ASSIGN
+              - column:
+                  name: permission_name
+                  value: 分配角色
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 3
+              - column:
+                  name: sort_order
+                  valueNumeric: 5
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # ------ 权限管理按钮权限 ------
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION_CREATE
+              - column:
+                  name: permission_name
+                  value: 创建权限
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 4
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION_DELETE
+              - column:
+                  name: permission_name
+                  value: 删除权限
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 4
+              - column:
+                  name: sort_order
+                  valueNumeric: 2
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION_UPDATE
+              - column:
+                  name: permission_name
+                  value: 编辑权限
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 4
+              - column:
+                  name: sort_order
+                  valueNumeric: 3
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION_QUERY
+              - column:
+                  name: permission_name
+                  value: 查询权限
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 4
+              - column:
+                  name: sort_order
+                  valueNumeric: 4
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_PERMISSION_ASSIGN
+              - column:
+                  name: permission_name
+                  value: 分配权限
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 4
+              - column:
+                  name: sort_order
+                  valueNumeric: 5
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        # ------ 文件管理按钮权限 ------
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_FILE_UPLOAD
+              - column:
+                  name: permission_name
+                  value: 文件上传
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 5
+              - column:
+                  name: sort_order
+                  valueNumeric: 1
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_FILE_DOWNLOAD
+              - column:
+                  name: permission_name
+                  value: 文件下载
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 5
+              - column:
+                  name: sort_order
+                  valueNumeric: 2
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: permission_code
+                  value: SYSTEM_FILE_DELETE
+              - column:
+                  name: permission_name
+                  value: 文件删除
+              - column:
+                  name: permission_type
+                  value: BUTTON
+              - column:
+                  name: parent_id
+                  valueNumeric: 5
+              - column:
+                  name: sort_order
+                  valueNumeric: 3
+              - column:
+                  name: status
+                  valueNumeric: 1
+              - column:
+                  name: deleted
+                  valueNumeric: 0
+
+  # ============================================================
+  # 三、分配角色-权限关联
+  # ============================================================
+
+  # --- 3.1 ADMIN 角色分配所有权限（1-22）---
+  - changeSet:
+      id: v007-assign-admin-all-permissions
+      author: scaffold
+      comment: 为ADMIN角色分配所有权限
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 2 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 3 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 4 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 5 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 6 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 7 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 8 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 9 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 10 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 11 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 12 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 13 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 14 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 15 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 16 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 17 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 18 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 19 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 20 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 21 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 22 }
+
+  # --- 3.2 USER 角色分配基本权限 ---
+  - changeSet:
+      id: v007-assign-user-basic-permissions
+      author: scaffold
+      comment: 为USER角色分配基本权限（系统管理菜单、用户管理菜单、查询用户）
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 2 }
+              - column: { name: permission_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 2 }
+              - column: { name: permission_id, valueNumeric: 2 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 2 }
+              - column: { name: permission_id, valueNumeric: 8 }
